@@ -6,11 +6,11 @@ import (
 )
 
 func main(){
-	anthill,err := tools.LaodFileInput("./mohammed.txt")
+	anthill,err := tools.LaodFileInput("./input01.txt")
 	tools.HandelError(err,"")
 
 	err = anthill.ValidateAnthill()
-	
+
 	if err != nil {
 		fmt.Println(err)
 	} else {
