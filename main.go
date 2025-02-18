@@ -6,14 +6,14 @@ import (
 )
 
 func main(){
-	anthill,err := tools.LaodFileInput("./input01.txt")
+	myAnthill,err := tools.LaodFileInput("./input01.txt")
 	tools.HandelError(err,"")
-
-	err = anthill.ValidateAnthill()
+	
+	err = myAnthill.ValidateAnthill()
 
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		anthill.ShowAnthill()
+		myAnthill.ShowAnthill()
 	}
 }
