@@ -7,47 +7,14 @@ import (
 	"strings"
 	"strconv"
 	"errors"
+	"lem-in/anthill"
 )
-var flags = []string{"##start","##end","##comment"}
-type Anthill struct {
-	StartRoom []int
-	EndRoom []int
-	isMiddelRooms [][]int
-}
 
-func (this Anthill) ValidateAnthill() error {
-	var err error
-	if len(this.StartRoom) == 0 || len(this.EndRoom) == 0 {
-		err = errors.New("The Room ##start or ##end is required")
-	} else if len(this.isMiddelRooms) == 0 {
-		err = errors.New("you must have at least one middle room")
-	}
-
-	if err != nil {
-		return errors.New(fmt.Sprintf("The Anthill is not valid : %v",err))
-	} else {
-		return nil
-	}
-}
-
-func (this Anthill) ShowAnthill() {
-
-	fmt.Println("====================================")
-	fmt.Println("  📜 Information  de la Foumilière  ")
-	fmt.Println("====================================")
-
-	fmt.Printf("Start Room : %v \n",this.StartRoom)
-	fmt.Printf("Middle Rooms : %v\n",this.isMiddelRooms)
-	fmt.Printf("End Room : %v \n",this.EndRoom)
-	
-	fmt.Println("====================================")
-}
-
-func LaodFileInput(filePath string)(Anthill,error){
+func LaodFileInput(filePath string)(anthill.Anthill,error){
 	isFlag := false
 	theFlag := ""
-	isMiddelRoom := false
-	myAnthill := Anthill{}
+	myAnthill := anthill.Anthill{}
+	myRoom := myAnthill.Rooms
 	indexLine := 0
 
 	file, err := os.Open(filePath)
@@ -55,76 +22,79 @@ func LaodFileInput(filePath string)(Anthill,error){
 	defer file.Close()
 	
 	scanner := bufio.NewScanner(file)
-	for scanner.Scan(){
+	for scanner.Scan() {
+
 		indexLine++
 		line := scanner.Text()
 
-		if isFlag {
-			if theFlag == flags[0] || theFlag == flags[1] {
-				target :=  strings.Split(line," ")
-				if len(target) != 3 {
-					return myAnthill,errors.New(fmt.Sprintf("Invalid input Line : %v ( %v )\n",indexLine,line))
-				}
-				for _, strVal := range target {
-					intVal, err := strconv.Atoi(strVal)
-					if err != nil {
-						return myAnthill,err
-					}
-					if theFlag == flags[0] {
-						myAnthill.StartRoom = append(myAnthill.StartRoom, intVal)
-					} else {
-						myAnthill.EndRoom = append(myAnthill.EndRoom, intVal)
-					}
-					if theFlag == flags[0] { //Start Room
-						isMiddelRoom = true
-					} else if theFlag == flags[1] { //End Room
-						isMiddelRoom = false
-					}
-				}
-				isFlag = false
-				theFlag = ""
-				continue
+		if indexLine == 1 {
+			ants,err := strconv.Atoi(line)
+			if err != nil {
+				myAnthill = anthill.Anthill{}
+				return myAnthill,err
 			}
+			myAnthill.AddAntsInRoom(ants,anthill.Flags[0],"")
+			myRoom = myAnthill.GetRoomType(myAnthill)
+			continue
 		}
 
 		if strings.HasPrefix(line,"##") {
-			if line == flags[0] || line == flags[1] {
+			if line == anthill.Flags[0] || line == anthill.Flags[1] {
 				theFlag = line
 				isFlag = true
-				continue			
-			} else if line == flags[2] {
+				continue
+			} else if line == anthill.Flags[2] {
 				continue
 			} else {
+				myAnthill = anthill.Anthill{}
 				return myAnthill,errors.New(fmt.Sprintf("Invalid input Line : %v ( %v )\n",indexLine,line))
 			}
 		}
 
-		if isMiddelRoom {
-			target := strings.Split(line," ")
-			if len(target) != 3 {
-				return myAnthill,errors.New(fmt.Sprintf("Invalid input Line : %v ( %v )\n",indexLine,line))
-			}
-			var newMiddleRoom []int
-			for _,strVal := range target {
-				intVal,err := strconv.Atoi(strVal) 
-				if err != nil {
+		if isFlag {
+			if theFlag == anthill.Flags[0] || theFlag == anthill.Flags[1] {
+				err := makeRoom(&myRoom,theFlag,line, indexLine)
+				if !HandelError(err,"") {
+					myAnthill.AddRoomInAnthill(myRoom)
+					isFlag = false
+					theFlag = ""
+					myRoom = anthill.Room{}
+					continue
+				} else {
+					myAnthill = anthill.Anthill{}
 					return myAnthill,err
 				}
-				newMiddleRoom = append(newMiddleRoom,intVal)
+
 			}
-			myAnthill.isMiddelRooms = append(myAnthill.isMiddelRooms,newMiddleRoom)
 		}
+
+		if !isFlag {
+			err := makeRoom(&myRoom,"middleRoom",line, indexLine)
+			if !HandelError(err, "") {
+				myAnthill.AddRoomInAnthill(myRoom)
+				isFlag = false
+				theFlag = ""
+				//myRoom = anthill.Room{}
+			} else {
+				myAnthill = anthill.Anthill{}
+				return myAnthill,err
+			}
+		}
+
 	}
 	return myAnthill,nil
 }
 
-func HandelError(err error,message string) {	
+func HandelError(err error,customMessage string) bool{	
 	if err != nil {
-		if message != "" {
-			fmt.Printf("%v",message)
+		if customMessage != "" {
+			fmt.Printf("%v",customMessage)
 		} else {
 			fmt.Printf("%v",err)
 		}
+		return true
 	}
+	return false
 }
+
 
