@@ -8,13 +8,15 @@ import (
 	"strconv"
 	"errors"
 	"lem-in/anthill"
+	//"lem-in/room"
 )
 
 func LaodFileInput(filePath string)(anthill.Anthill,error){
 	isFlag := false
 	theFlag := ""
+	//var myRooms room.Room{}
 	myAnthill := anthill.Anthill{}
-	myRoom := myAnthill.Rooms
+	//myRoom := myAnthill.Rooms
 	indexLine := 0
 
 	file, err := os.Open(filePath)
@@ -33,17 +35,17 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 				myAnthill = anthill.Anthill{}
 				return myAnthill,err
 			}
-			myAnthill.AddAntsInRoom(ants,anthill.Flags[0],"")
-			myRoom = myAnthill.GetRoomType(myAnthill)
+			myAnthill.AddAntsInRoom(ants,anthill.Commandes[0],"")
+			//myRoom = myAnthill.GetRoomType(myAnthill)
 			continue
 		}
 
 		if strings.HasPrefix(line,"##") {
-			if line == anthill.Flags[0] || line == anthill.Flags[1] {
+			if line == anthill.Commandes[0] || line == anthill.Commandes[1] {
 				theFlag = line
 				isFlag = true
 				continue
-			} else if line == anthill.Flags[2] {
+			} else if line == anthill.Commandes[2] {
 				continue
 			} else {
 				myAnthill = anthill.Anthill{}
@@ -52,9 +54,9 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 		}
 
 		if isFlag {
-			if theFlag == anthill.Flags[0] || theFlag == anthill.Flags[1] {
-				err := makeRoom(&myRoom,theFlag,line, indexLine)
-				if !HandelError(err,"") {
+			if theFlag == anthill.Commandes[0] || theFlag == anthill.Commandes[1] {
+				//err := makeRoom(&myRoom,theFlag,line, indexLine)
+				/*if !HandelError(err,"") {
 					myAnthill.AddRoomInAnthill(myRoom)
 					isFlag = false
 					theFlag = ""
@@ -63,13 +65,13 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 				} else {
 					myAnthill = anthill.Anthill{}
 					return myAnthill,err
-				}
+				}*/
 
 			}
 		}
 
 		if !isFlag {
-			err := makeRoom(&myRoom,"middleRoom",line, indexLine)
+			/*err := makeRoom(&myRoom,"middleRoom",line, indexLine)
 			if !HandelError(err, "") {
 				myAnthill.AddRoomInAnthill(myRoom)
 				isFlag = false
@@ -78,7 +80,7 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 			} else {
 				myAnthill = anthill.Anthill{}
 				return myAnthill,err
-			}
+			}*/
 		}
 
 	}
@@ -96,5 +98,3 @@ func HandelError(err error,customMessage string) bool{
 	}
 	return false
 }
-
-
