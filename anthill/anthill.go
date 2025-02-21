@@ -18,20 +18,35 @@ type Anthill struct {
 	Rooms []room.Room
 }
 
-func (this *Anthill) SetRoom(room room.Room) error {
+func (this *Anthill) AddRoomInAnthill(room room.Room) error {
+
+	fmt.Println(fmt.Sprintf("🏗️ Room ( %v ) creation is in progress, please wait...",room.Name))
+
+	err := false
+	errMessage := ""
+
+	for _,thisRoom := range this.Rooms {
+		if room.Type == Commandes[INDEX_START] && thisRoom.Type == Commandes[INDEX_START] {
+			err = true
+			errMessage = fmt.Sprintf("Error ❌ : (%v)\nAtnhill can't have two rooms Start !",room.Name)
+		}
+	}
+
 	if !common.Contain(room.Type,Commandes) {
-		return errors.New(fmt.Sprintf("Room (%v) invalid ",room.Type))
+		err = true
+		errMessage = fmt.Sprintf("Error ❌ : \nRoom (%v) invalid ",room.Type)
+	} else if room.Name == "" {
+		err = true
+		errMessage = ("Error ❌ : \nThe room must have a name")
+	} else if room.Type == Commandes[INDEX_MIDDLEROOM] && len(room.Ants) > 0 {
+		err = true
+		errMessage = ("Error ❌ : \nIn middleroom should only contain one ant")
 	}
-	this.Rooms = append(this.Rooms,room)
-	return nil
-}
 
-func (this *Anthill) AddRoomInAnthill(room room.Room)error {
-	if room.Type != Commandes[0] || room.Type != Commandes[1] || room.Type != Commandes[3] {
-		return errors.New(fmt.Sprintf("type room (%v) et invalide ",room.Type))
-	}
+	if err {
+		return errors.New(common.ColorString(common.INDEX_C_RED,errMessage))
+	} 
 	this.Rooms = append(this.Rooms,room)
-
 	return nil
 }
 
@@ -45,8 +60,14 @@ func (this Anthill) ShowAnthill() {
 	fmt.Println("  📜 Information  de la Foumilière  ")
 	fmt.Println("====================================")
 
+	for _,room := range this.Rooms {
+		fmt.Println(fmt.Sprintf("Type Room : %v",room.Type))
+		fmt.Println(fmt.Sprintf("Name room : %v",room.Name))
+		fmt.Println(fmt.Sprintf("Number ants in room : %v",len(room.Ants)))
+		fmt.Println("====================================")
+
+	}
 	
-	fmt.Println("====================================")
 }
 
 func (this Anthill) GetRoomType(typeRoom string) room.Room {
