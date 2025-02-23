@@ -1,24 +1,58 @@
 package main
 
 import (
+	//"fmt"
 	"lem-in/tools"
-	"lem-in/anthill"
+	"lem-in/tools/common"
 	"lem-in/room"
+	"lem-in/anthill"
 )
 
 func main(){
 
-	ants := []uint{1,2,3,4}
 	myAnthill := anthill.Anthill{}
 
-	myRooms := []room.Room{}
-	myRooms = append(myRooms,room.Room{Type: anthill.Commandes[anthill.INDEX_START],Name: "mohammed", Ants: ants})
-	ants = []uint{}
-	myRooms = append(myRooms,room.Room{Type: anthill.Commandes[anthill.INDEX_MIDDLEROOM],Name: "amine", Ants: ants})
-	ants = []uint{}
-	myRooms = append(myRooms,room.Room{Type: anthill.Commandes[anthill.INDEX_END],Name: "aidi", Ants: ants})
+	typeRoom := common.Commandes[common.INDEX_START]
+	nameRoom := "Mohammed"
+	point_x := 3
+	point_y := 6
+	ants := []uint{1}
 
-	err := myAnthill.InitAnthill(myRooms)
+	myRooms := []room.Room{}
+	NewRoom,err := room.MakeRoom(typeRoom,nameRoom,point_x,point_y,ants)
+	if tools.HandelError(err,"") {
+		//fmt.Println(err)
+		return
+	}
+	myRooms = append(myRooms,NewRoom)
+
+	typeRoom = common.Commandes[common.INDEX_MIDDLEROOM]
+	nameRoom = "Amine"
+	point_x = 3
+	point_y = 6
+	ants = []uint{}
+
+	NewRoom = room.Room{}
+	NewRoom,err = room.MakeRoom(typeRoom,nameRoom,point_x,point_y,ants)
+	if tools.HandelError(err,"") {
+		return
+	}
+	myRooms = append(myRooms,NewRoom)
+
+	typeRoom = common.Commandes[common.INDEX_END]
+	nameRoom = "Fidal"
+	point_x = 8
+	point_y = 5
+	ants = []uint{}
+
+	NewRoom = room.Room{}
+	NewRoom,err = room.MakeRoom(typeRoom,nameRoom,point_x,point_y,ants)
+	if tools.HandelError(err,"") {
+		return
+	}
+	myRooms = append(myRooms,NewRoom)
+
+	err = myAnthill.InitAnthill(myRooms)
 	if tools.HandelError(err,"") {
 		return
 	}

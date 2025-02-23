@@ -9,6 +9,7 @@ import (
 	"errors"
 	"lem-in/anthill"
 	//"lem-in/room"
+	"lem-in/tools/common"
 )
 
 func LaodFileInput(filePath string)(anthill.Anthill,error){
@@ -41,11 +42,11 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 		}
 
 		if strings.HasPrefix(line,"##") {
-			if line == anthill.Commandes[0] || line == anthill.Commandes[1] {
+			if line == common.Commandes[common.INDEX_START] || line == common.Commandes[common.INDEX_END] {
 				theFlag = line
 				isFlag = true
 				continue
-			} else if line == anthill.Commandes[2] {
+			} else if line == common.Commandes[common.INDEX_COMMENT] {
 				continue
 			} else {
 				myAnthill = anthill.Anthill{}
@@ -54,7 +55,7 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 		}
 
 		if isFlag {
-			if theFlag == anthill.Commandes[0] || theFlag == anthill.Commandes[1] {
+			if theFlag == common.Commandes[common.INDEX_START] || theFlag == common.Commandes[common.INDEX_END] {
 				//err := makeRoom(&myRoom,theFlag,line, indexLine)
 				/*if !HandelError(err,"") {
 					myAnthill.AddRoomInAnthill(myRoom)
@@ -91,10 +92,11 @@ func HandelError(err error,customMessage string) bool{
 	if err != nil {
 		if customMessage != "" {
 			fmt.Printf("%v",customMessage)
+			return true
 		} else {
 			fmt.Printf("%v",err)
+			return true
 		}
-		return true
 	}
 	return false
 }
