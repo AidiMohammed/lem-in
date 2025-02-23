@@ -18,9 +18,29 @@ type Anthill struct {
 	Rooms []room.Room
 }
 
-func (this *Anthill) AddRoomInAnthill(room room.Room) error {
+func (this *Anthill) InitAnthill(rooms []room.Room) error {
+	
+	common.BoxString("===== ⏳ Init the Anthill in progress, please wait... =====")
 
-	fmt.Println(fmt.Sprintf("🏗️ Room ( %v ) creation is in progress, please wait...",room.Name))
+	if len(this.Rooms) > 0 {
+		this.Rooms = []room.Room{}
+	}
+	for _,room := range rooms {
+		err := this.addNewRoomInAnthill(room)
+		if err != nil {
+			return err
+		}
+	}
+	if !this.isValidAnthill() {
+		return errors.New(common.ColorString(common.INDEX_C_RED,"Error ❌ : \nThe anthill is not valid"))
+	}	
+	fmt.Println(common.ColorString(common.INDEX_C_GREEN,"✅ Your Anthill had been initialized succesfully !"))
+	return nil 
+}
+
+func (this *Anthill) addNewRoomInAnthill(room room.Room) error {
+
+	fmt.Printf("⏳ Room ( %v ) creation is in progress, please wait...\n",room.Name)
 
 	err := false
 	errMessage := ""
@@ -34,13 +54,16 @@ func (this *Anthill) AddRoomInAnthill(room room.Room) error {
 
 	if !common.Contain(room.Type,Commandes) {
 		err = true
-		errMessage = fmt.Sprintf("Error ❌ : \nRoom (%v) invalid ",room.Type)
+		errMessage = fmt.Sprintf("Error ❌ : \nThe room (%v) invalid, unknown command !",room.Type)
 	} else if room.Name == "" {
 		err = true
-		errMessage = ("Error ❌ : \nThe room must have a name")
+		errMessage = ("Error ❌ : \nThe room must have a name !")
 	} else if room.Type == Commandes[INDEX_MIDDLEROOM] && len(room.Ants) > 0 {
 		err = true
-		errMessage = ("Error ❌ : \nIn middleroom should only contain one ant")
+		errMessage = ("Error ❌ : \nThe middle room should not contain ants !")
+	} else if room.Type == Commandes[INDEX_END] && len(room.Ants) > 0 {
+		err = true
+		errMessage = ("Error ❌ : \nThe end room shpuld not contain ants !")
 	}
 
 	if err {
@@ -50,8 +73,25 @@ func (this *Anthill) AddRoomInAnthill(room room.Room) error {
 	return nil
 }
 
-func (this Anthill) ValidateAnthill() error {
-	return nil
+func (this Anthill) isValidAnthill() bool {
+	startRoom := false
+	endRoom := false
+	middleRoom := false
+
+	for _,room := range this.Rooms {
+		if room.Type == Commandes[INDEX_START] {
+			startRoom = true
+		} else if room.Type == Commandes[INDEX_MIDDLEROOM] {
+			middleRoom = true
+		} else if room.Type == Commandes[INDEX_END] {
+			endRoom = true
+		}
+	}
+	if startRoom && middleRoom && endRoom {
+		return true
+	}
+
+	return false
 }
 
 func (this Anthill) ShowAnthill() {
@@ -68,17 +108,4 @@ func (this Anthill) ShowAnthill() {
 
 	}
 	
-}
-
-func (this Anthill) GetRoomType(typeRoom string) room.Room {
-	myRoom := room.Room{}
-	return myRoom
-}
-
-func (this *Anthill) AddAntsInRoom(countAnt int,typeRoom string, nameRoom string) error {
-	return nil
-}
-
-func (this *Anthill) initAnthill(){
-	//
 }

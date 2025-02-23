@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"bufio"
 	"strings"
-	"strconv"
+	//"strconv"
 	"errors"
 	"lem-in/anthill"
 	//"lem-in/room"
@@ -30,12 +30,12 @@ func LaodFileInput(filePath string)(anthill.Anthill,error){
 		line := scanner.Text()
 
 		if indexLine == 1 {
-			ants,err := strconv.Atoi(line)
+			//ants,err := strconv.Atoi(line)
 			if err != nil {
 				myAnthill = anthill.Anthill{}
 				return myAnthill,err
 			}
-			myAnthill.AddAntsInRoom(ants,anthill.Commandes[0],"")
+			//myAnthill.AddAntsInRoom(ants,anthill.Commandes[0],"")
 			//myRoom = myAnthill.GetRoomType(myAnthill)
 			continue
 		}
