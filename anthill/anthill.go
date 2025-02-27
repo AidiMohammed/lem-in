@@ -9,6 +9,8 @@ import (
 
 type Anthill struct {
 	Rooms []room.Room
+	Tunnels []map[*room.Room][]*room.Room
+
 }
 
 func (this *Anthill) InitAnthill(rooms []room.Room) error {
@@ -28,10 +30,8 @@ func (this *Anthill) InitAnthill(rooms []room.Room) error {
 	return nil 
 }
 
-func (this *Anthill) addNewRoomInAnthill(room room.Room) error {
-
+func (this *Anthill) addNewRoomInAnthill(room room.Room) {
 	this.Rooms = append(this.Rooms,room)
-	return nil
 }
 
 func (this Anthill) isValidAnthill() bool {
@@ -57,9 +57,7 @@ func (this Anthill) isValidAnthill() bool {
 
 func (this Anthill) ShowAnthill() {
 
-	fmt.Println("====================================")
-	fmt.Println("  📜 Information  de la Foumilière  ")
-	fmt.Println("====================================")
+	common.BoxString("Information  de la Foumilière")
 
 	for _,room := range this.Rooms {
 		fmt.Println(fmt.Sprintf("Type Room : %v",room.Type))
@@ -69,4 +67,21 @@ func (this Anthill) ShowAnthill() {
 
 	}
 	
+}
+
+func (this *Anthill) MakeNodes(kayRom *room.Room, valueRoom *room.Room) {
+	fmt.Println("Make the Nodes : ")
+	fmt.Println(kayRom)
+	fmt.Println(valueRoom)
+}
+
+func (this Anthill) GetRoomByName(nameRoom string) (*room.Room,error) {
+	for _,room := range this.Rooms {
+		if room.Name == nameRoom {
+			return &room,nil
+		}
+	}
+	emptyRoom := room.Room{}
+	errMessage := fmt.Sprintf("Error ❌ : \nThe room %v is not found in the anthill ",nameRoom)
+	return &emptyRoom,errors.New(common.ColorString(common.INDEX_C_RED,errMessage)) 
 }
