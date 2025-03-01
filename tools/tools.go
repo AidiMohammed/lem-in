@@ -7,24 +7,26 @@ import (
 	"strings"
 	"strconv"
 	"errors"
-	//"lem-in/anthill"
+	"lem-in/anthill"
 	"lem-in/room"
 	"lem-in/tools/common"
+
 )
 
-func LaodFileInputs(filePath string)([]room.Room,error){
+func MakeAnthill(filePath string)(anthill.Anthill,error){
 	file, err := os.Open(filePath)
 	HandelError(err,"")
 
 	isFlag := false
 	var theFlag string
 	var rooms []room.Room
+	var myAnthill anthill.Anthill
 	var indexLine uint
 	var ants []uint
+	scanner := bufio.NewScanner(file)
 
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
 		indexLine++
@@ -36,7 +38,7 @@ func LaodFileInputs(filePath string)([]room.Room,error){
 				ants = append(ants,uint(index))
 			}
 			if HandelError(err,"") {
-				return rooms,errors.New(common.ColorString(common.INDEX_C_RED,"Error ❌ : \nYour file dose not contain a number of ants !"))
+				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,"Error ❌ : \nYour file dose not contain a number of ants !"))
 			}
 			continue
 		}
@@ -50,27 +52,26 @@ func LaodFileInputs(filePath string)([]room.Room,error){
 				continue
 			} else {
 				errMessage := fmt.Sprintf("Error ❌ : \nInvalid input line : %v (%v)",indexLine,line)
-				return rooms,errors.New(common.ColorString(common.INDEX_C_RED,errMessage))
+				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,errMessage))
 			}
 		}
 
 		lineSplit := strings.Split(line," ")
 		if len(lineSplit) > 3 {
-			return rooms,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
+			return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
 		} else if len(lineSplit) == 1 {
 			lineSplit = strings.Split(line,"-")
 			if len(lineSplit) == 2 {
-				//Managment tunnels
-				//fmt.Println(fmt.Sprintf("tunnel 1 : %v | tunnel 2 : %v",lineSplit[0],lineSplit[1]))
-				//roomKey := 
-				return rooms,errors.New(common.ColorString(common.INDEX_C_GREEN,"Managment tunnels \n"))
+				//Tunnel handling
+
+				continue
 			} else {
-				return rooms,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
+				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
 			}
 		}
 
 		if isFlag {
-
+			//Flag Rooms (start/end) handling
 			nameRoom := lineSplit[0] 
 			antsRoom := []uint{}
 			if theFlag == common.Commandes[common.INDEX_START] {
@@ -80,39 +81,45 @@ func LaodFileInputs(filePath string)([]room.Room,error){
 
 			point_x,err := strconv.Atoi(lineSplit[1])
 			if err != nil{
-				return rooms,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
+				return myAnthill,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
 			}
 			point_y,err := strconv.Atoi(lineSplit[2])
 			if err != nil{
-				return rooms,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
+				return myAnthill,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
 			}
 			myRoom,err := room.MakeRoom(theFlag, nameRoom, point_x, point_y, antsRoom)
 			if HandelError(err,"") {
-				return rooms,err
+				return myAnthill,err
 			}
 			rooms = append(rooms,myRoom)
 			isFlag = false
 			theFlag = ""
-			continue	
+			continue
 		} else {
+			//Middle rooms handling
 			nameRoom := lineSplit[0]
 
 			point_x,err := strconv.Atoi(lineSplit[1])
 			if err != nil{
-				return rooms,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
+				return myAnthill,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
 			}
 			point_y,err := strconv.Atoi(lineSplit[2])
 			if err != nil{
-				return rooms,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
+				return myAnthill,errors.New(fmt.Sprintf("Error ❌ : \n%v",err))
 			}
 			myRoom,err := room.MakeRoom(common.Commandes[common.INDEX_MIDDLEROOM], nameRoom, point_x, point_y, []uint{})
 			if HandelError(err,"") {
-				return rooms,err
+				return myAnthill,err
 			}
 			rooms = append(rooms,myRoom)
 		}
 	}
-	return rooms,nil
+
+	err = myAnthill.InitAnthill(rooms)
+	if HandelError(err,""){
+		return myAnthill,errors.New("")
+	}
+	return myAnthill,nil
 }
 
 func HandelError(err error,customMessage string) bool{	
