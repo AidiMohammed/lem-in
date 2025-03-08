@@ -10,7 +10,6 @@ import (
 	"lem-in/anthill"
 	"lem-in/room"
 	"lem-in/tools/common"
-
 )
 
 func MakeAnthill(filePath string)(anthill.Anthill,error){
@@ -23,6 +22,8 @@ func MakeAnthill(filePath string)(anthill.Anthill,error){
 	var myAnthill anthill.Anthill
 	var indexLine uint
 	var ants []uint
+	myTunnels := make(map[string][]string)
+
 	scanner := bufio.NewScanner(file)
 
 	defer file.Close()
@@ -57,14 +58,30 @@ func MakeAnthill(filePath string)(anthill.Anthill,error){
 		}
 
 		lineSplit := strings.Split(line," ")
+
 		if len(lineSplit) > 3 {
 			return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
 		} else if len(lineSplit) == 1 {
 			lineSplit = strings.Split(line,"-")
+			if len(lineSplit) != 2 {
+				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file lien %v : %v",indexLine,line)))
+			}
 			if len(lineSplit) == 2 {
-				//Tunnel handling
-
-				continue
+				keyRoom := lineSplit[0]
+				valueRoom := lineSplit[1]
+				//Tunnels handling
+				if _,exist := myTunnels[keyRoom]; !exist {
+					for key,_ := range myTunnels {
+						if valueRoom == key {
+							myTunnels[key] = append(myTunnels[key],keyRoom)
+						}
+					}
+					myTunnels[keyRoom] = []string{valueRoom}
+					continue
+				} else if exist {
+					myTunnels[keyRoom] = append(myTunnels[keyRoom],valueRoom)
+					continue
+				}
 			} else {
 				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,fmt.Sprintf("Error ❌ : \nInvalid format file line %v : %v",indexLine,line)))
 			}
@@ -114,7 +131,7 @@ func MakeAnthill(filePath string)(anthill.Anthill,error){
 			rooms = append(rooms,myRoom)
 		}
 	}
-
+	common.BoxString(fmt.Sprintf("Tunnel : %v",myTunnels))
 	err = myAnthill.InitAnthill(rooms)
 	if HandelError(err,""){
 		return myAnthill,errors.New("")
@@ -133,15 +150,4 @@ func HandelError(err error,customMessage string) bool{
 		}
 	}
 	return false
-}
-
-func getRoomByName(roomName string,rooms []room.Room) (*room.Room,error){
-	for _,room := range rooms {
-		if room.Name == roomName {
-			return &room,nil
-		}
-	}
-	emptyRoom := room.Room{}
-	errMessage := fmt.Sprintf("Error ❌ : \nThe room %v is not found in the anthill ",roomName)
-	return &emptyRoom,errors.New(common.ColorString(common.INDEX_C_RED,errMessage)) 
 }

@@ -33,9 +33,9 @@ func ColorString (indexColor int,str string) string{
 func BoxString(str string) error {
 
 	if len(str) > 0 {
-		str = "==== "+str+" ===="
+		str = "=== "+str+" ==="
 		for index := 0; index < 2 ;index++ {
-			for indexStr := 1;indexStr < len(str);indexStr++ {
+			for indexStr := 0;indexStr < len(str);indexStr++ {
 				fmt.Print("=")
 			}
 			if(index == 0){

@@ -9,6 +9,7 @@ import (
 
 type Anthill struct {
 	Rooms []room.Room
+	Tunnels map[string][]string
 }
 
 func (this *Anthill) InitAnthill(rooms []room.Room) error {
@@ -59,7 +60,7 @@ func (this Anthill) ShowAnthill() {
 		common.BoxString(common.ColorString(common.INDEX_C_BLUE,"Your anthill is empty !"))
 		return
 	}
-	common.BoxString("Information de la Foumilière")
+	common.BoxString("🐜 Information de la Foumilière 🐜")
 
 	for _,room := range this.Rooms {
 		fmt.Println(fmt.Sprintf("Type Room : %v",room.Type))
@@ -69,10 +70,4 @@ func (this Anthill) ShowAnthill() {
 
 	}
 	
-}
-
-func (this *Anthill) MakeNodes(kayRom *room.Room, valueRoom *room.Room) {
-	fmt.Println("Make the Nodes : ")
-	fmt.Println(kayRom)
-	fmt.Println(valueRoom)
 }
