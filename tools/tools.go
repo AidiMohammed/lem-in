@@ -34,6 +34,9 @@ func MakeAnthill(filePath string)(anthill.Anthill,error){
 
 		if indexLine == 1 {
 			intAnts,err := strconv.Atoi(line)
+			if err != nil {
+				return myAnthill,errors.New(common.ColorString(common.INDEX_C_RED,"Error ❌ : \nYour file input is invalid"))
+			}
 
 			for index := 0 ; index < intAnts ; index++ {
 				ants = append(ants,uint(index))
